@@ -12,7 +12,7 @@ public:
 	void run();
 
 private:
-	std::vector<Sprite*> sprite;
+	std::vector<Sprite*> sprites;
 	std::vector<Sprite*> added, removed;
 };
 

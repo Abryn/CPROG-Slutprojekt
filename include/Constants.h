@@ -6,7 +6,7 @@
 namespace constants
 {
     //gResPath-contains the relative path to your resources.
-	const std::string gResPath = "../../resources/";
+	const std::string gResPath="./resources/";
 }
 
 #endif

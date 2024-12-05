@@ -1,25 +1,39 @@
 #include "Constants.h" //gResPath-contains path to your resources.
 #include "System.h"
 #include <SDL2/SDL.h>
+#include <iostream>
 
 
-System::System() {
+System::System()
+{
+	std::cout << "*** System::System()\n";
+	
 	SDL_Init(SDL_INIT_EVERYTHING);
-	win = SDL_CreateWindow("GameDemo", 10, 10, 700, 500, 0);
+	win = SDL_CreateWindow("Cwing", SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED, 600, 400, 0);
 	ren = SDL_CreateRenderer(win, -1, 0);
-	Mix_OpenAudio(20050, AUDIO_S16SYS, 2, 4096);
-	// Path to your own 'sounds' folder!
-  	//musik = Mix_LoadWAV("/Users/kjellna/dev/cpp21/f13b/sounds/bgMusic.wav");
-	musik = Mix_LoadWAV( (constants::gResPath + "sounds/bgMusic.wav").c_str() );
-	Mix_PlayChannel(-1, musik, -1);
+	TTF_Init();
+	font = TTF_OpenFont( (constants::gResPath + "fonts/arial.ttf").c_str(), 36);
+	std::cout << "resPath: " << constants::gResPath << std::endl;
 }
 
-System::~System() {
-	Mix_FreeChunk(musik);
-	Mix_CloseAudio();
+
+System::~System()
+{
+	std::cout << "*** System::~System()\n";
+	TTF_CloseFont(font);
+	TTF_Quit();
 	SDL_DestroyWindow(win);
 	SDL_DestroyRenderer(ren);
 	SDL_Quit();
 }
 
-System sys;
+SDL_Renderer* System::get_ren() const {
+	return ren;
+}
+
+TTF_Font* System::get_font() const {
+	return font;
+}
+
+System sys; // Statiskt globalt objekt (definierad utanför funktioner.)
