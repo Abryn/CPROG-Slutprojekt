@@ -3,7 +3,6 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 
-
 System::System()
 {
 	std::cout << "*** System::System()\n";
@@ -16,7 +15,6 @@ System::System()
 	font = TTF_OpenFont( (constants::gResPath + "fonts/arial.ttf").c_str(), 36);
 	std::cout << "resPath: " << constants::gResPath << std::endl;
 }
-
 
 System::~System()
 {

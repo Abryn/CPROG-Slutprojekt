@@ -29,6 +29,7 @@ Button::Button(int x, int y, int w, int h, std::string txt) : Sprite(x,y,w,h)
 		if (SDL_PointInRect(&p, &getRect()))
 			isDown = true;
 	}
+
 	void Button::mouseUp(const SDL_Event& eve) {
 		SDL_Point p = { eve.button.x, eve.button.y };
 		if (SDL_PointInRect(&p, &getRect()))
@@ -36,6 +37,7 @@ Button::Button(int x, int y, int w, int h, std::string txt) : Sprite(x,y,w,h)
 
 		isDown = false;
 	}
+
 	void Button::draw() const {
 		if (isDown)
 			SDL_RenderCopy(sys.get_ren(), downIcon, NULL, &getRect());
@@ -43,5 +45,4 @@ Button::Button(int x, int y, int w, int h, std::string txt) : Sprite(x,y,w,h)
 			SDL_RenderCopy(sys.get_ren(), upIcon, NULL, &getRect());
 
 		SDL_RenderCopy(sys.get_ren(), texture, NULL, &getRect());
-
 	}
