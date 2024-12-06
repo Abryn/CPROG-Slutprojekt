@@ -54,19 +54,19 @@ private:
 };
 
 class Character : public Sprite {
-public:
-private:
-//move
-//jump
-//tick
+	public:
+	private:
+	//move
+	//jump
+	//tick
 
 };
 
 class Entity : public Sprite {
-public:
-private:
-//move
-//tick
+	public:
+	private:
+	//move
+	//tick
 
 };
 
