@@ -6,6 +6,7 @@
 
 namespace cwing 
 {
+
 	Button::Button(int x, int y, int w, int h, std::string txt):Component(x,y,w,h)
 	{
 		SDL_Surface* surf = TTF_RenderText_Solid(sys.get_font(), txt.c_str(), { 0,0,0 });

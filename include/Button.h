@@ -1,12 +1,15 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include "Sprite.h"
+#include "Component.h"
 #include <SDL2/SDL.h>
 #include <string>
 
-class Button : public Sprite {
-    public:
+namespace cwing 
+{
+	class Button : public Component
+	{
+	public:
 		static Button* getInstance(int x, int y, int w, int h, std::string txt);
 		void mouseDown(const SDL_Event&);
 		void mouseUp(const SDL_Event&);
@@ -20,6 +23,7 @@ class Button : public Sprite {
 		SDL_Texture* texture;
 		SDL_Texture* upIcon, *downIcon;
 		bool isDown = false;
-};
+	};
+}
 
 #endif
