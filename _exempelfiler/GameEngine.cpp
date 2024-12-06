@@ -3,6 +3,8 @@
 #include "Sprite.h"
 #include "System.h"
 
+// Hej Hej
+
 using namespace std;
 
 #define FPS 80
