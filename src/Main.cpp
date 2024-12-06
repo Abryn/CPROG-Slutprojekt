@@ -33,7 +33,7 @@ int value = 0;
 
 class OkaKnapp : public Button {
 public:
-	OkaKnapp(Label *lbl) :Button(100, 100, 150, 70, "Oka"), label(lbl) {}
+	OkaKnapp(Label *lbl) :Button(200, 465, 150, 70, "Oka"), label(lbl) {}
 	void perform(Button* source) {
 		value++;
 		label->setText(to_string(value));
@@ -42,10 +42,9 @@ private:
 	Label* label;
 };
 
-
 class MinskaKnapp : public Button {
 public:
-	MinskaKnapp(Label *lbl) :Button(400, 100, 150, 70, "Minska"), label(lbl) {}
+	MinskaKnapp(Label *lbl) :Button(650, 465, 150, 70, "Minska"), label(lbl) {}
 	void perform(Button* source) {
 		value--;
 		label->setText(to_string(value));
@@ -55,35 +54,34 @@ private:
 };
 
 class Character : public Sprite {
-	public:
-	private:
-	//move
-	//jump
-	//tick
+public:
+private:
+//move
+//jump
+//tick
 
 };
 
 class Entity : public Sprite {
-	public:
-	private:
-	//move
-	//tick
+public:
+private:
+//move
+//tick
 
 };
 
 int main(int argc, char** argv) {
 	std::cout << "*** main()\n";
-
+	
 	GameEngine engine;
 	
-	Label* lbl = Label::getInstance(270, 100, 100, 70, "0");
+	Label* lbl = Label::getInstance(450, 465, 100, 70, "0");
 	engine.add(lbl);
 	Button* b = new OkaKnapp(lbl);
 	engine.add(b);
 	Button* b2 = new MinskaKnapp(lbl);
 	engine.add(b2);
 	engine.run();
-	
 	
 	return 0;
 }
