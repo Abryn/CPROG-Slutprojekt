@@ -1,14 +1,14 @@
 #ifndef LABEL_H
 #define LABEL_H
 
-#include "Component.h"
+#include "Sprite.h"
 #include <string>
 #include <SDL2/SDL.h>
 
 namespace cwing 
 {
 
-	class Label: public Component
+	class Label: public Sprite
 	{
 	public:
 		static Label* getInstance(int x, int y, int w, int h, std::string txt);

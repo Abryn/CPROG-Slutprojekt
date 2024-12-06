@@ -1,12 +1,12 @@
 /* Följande filer måste finnas i 'src/':
- * Button.cpp, Component.cpp, Label.cpp, f12_main.cpp, Session.cpp, System.cpp
+ * Button.cpp, Component.cpp, Label.cpp, f12_main.cpp, enginesion.cpp, System.cpp
  * Följande filer måste finnas i 'include/':
- * Button.h, Component.h, Constants.h, Label.h, Session.h, System.h
+ * Button.h, Component.h, Constants.h, Label.h, enginesion.h, System.h
  */
 
 #include <SDL2/SDL.h>
 #include "Label.h"
-#include "Session.h"
+#include "GameEngine.h"
 #include "Button.h"
 #include <string>
 
@@ -54,20 +54,36 @@ private:
 	Label* label;
 };
 
+class Character : public Sprite {
+	public:
+	private:
+	//move
+	//jump
+	//tick
+
+};
+
+class Entity : public Sprite {
+	public:
+	private:
+	//move
+	//tick
+
+};
 
 int main(int argc, char** argv) {
 	std::cout << "*** main()\n";
 	
 
-	Session ses;
+	GameEngine engine;
 	
 	Label* lbl = Label::getInstance(270, 100, 100, 70, "0");
-	ses.add(lbl);
+	engine.add(lbl);
 	Button* b = new OkaKnapp(lbl);
-	ses.add(b);
+	engine.add(b);
 	Button* b2 = new MinskaKnapp(lbl);
-	ses.add(b2);
-	ses.run();
+	engine.add(b2);
+	engine.run();
 	
 	
 	return 0;

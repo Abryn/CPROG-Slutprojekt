@@ -1,4 +1,4 @@
-#include "Session.h"
+#include "GameEngine.h"
 #include <SDL2/SDL.h>
 #include "System.h"
 
@@ -6,16 +6,15 @@
 
 namespace cwing 
 {
-
-	Session::Session(){
-		std::cout << "*** Session::Session()\n";
+	GameEngine::GameEngine(){
+		std::cout << "*** GameEngine::GameEngine()\n";
 	}
 
-	void Session::add(Component* c) {
-		comps.push_back(c);
+	void GameEngine::add(Sprite* s) {
+		sprites.push_back(s);
 	}
 
-	void Session::run() {
+	void GameEngine::run() {
 		bool quit = false;
 		while (!quit) {
 			SDL_Event eve;
@@ -23,20 +22,20 @@ namespace cwing
 				switch (eve.type) {
 				case SDL_QUIT: quit = true; break;
 				case SDL_MOUSEBUTTONDOWN:
-					for (Component* c : comps)
-						c->mouseDown(eve);
+					for (Sprite* s : sprites)
+						s->mouseDown(eve);
 					break;
 				case SDL_MOUSEBUTTONUP:
-					for (Component* c : comps)
-						c->mouseUp(eve);
+					for (Sprite* s : sprites)
+						s->mouseUp(eve);
 					break;
 				case SDL_KEYDOWN:
-					for (Component* c : comps)
-						c->keyDown(eve);
+					for (Sprite* s : sprites)
+						s->keyDown(eve);
 					break;
 				case SDL_KEYUP:
-					for (Component* c : comps)
-						c->keyUp(eve);
+					for (Sprite* s : sprites)
+						s->keyUp(eve);
 					break;
 
 				} // switch
@@ -44,15 +43,15 @@ namespace cwing
 			
 			SDL_SetRenderDrawColor(sys.get_ren(), 255, 255, 255, 255);
 			SDL_RenderClear(sys.get_ren());
-			for (Component* c : comps)
-				c->draw();
+			for (Sprite* s : sprites)
+				s->draw();
 			SDL_RenderPresent(sys.get_ren());
 
 		} //yttre while
 
 	}
 
-	Session::~Session()
+	GameEngine::~GameEngine()
 	{
 	}
 }

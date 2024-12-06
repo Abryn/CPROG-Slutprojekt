@@ -1,14 +1,14 @@
-#ifndef COMPONENT_H
-#define COMPONENT_H
+#ifndef SPRITE_H
+#define SPRITE_H
 
 #include <SDL2/SDL.h>
 
 namespace cwing 
 {
-	class Component
+	class Sprite
 	{
 	public:
-		virtual ~Component();
+		virtual ~Sprite();
 		virtual void mouseDown(const SDL_Event&) {}
 		virtual void mouseUp(const SDL_Event&) {}
 		virtual void keyDown(const SDL_Event&) {}
@@ -16,11 +16,11 @@ namespace cwing
 		virtual void draw() const = 0;
 		const SDL_Rect& getRect() const { return rect; }
 	protected:
-		Component(int x, int y, int w, int h);
+		Sprite(int x, int y, int w, int h);
 	private:
 		SDL_Rect rect;
-		Component(const Component&) = delete;
-		const Component& operator=(const Component&) = delete;
+		Sprite(const Sprite&) = delete;
+		const Sprite& operator=(const Sprite&) = delete;
 	};
 }
 #endif

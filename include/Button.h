@@ -1,13 +1,13 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include "Component.h"
+#include "Sprite.h"
 #include <SDL2/SDL.h>
 #include <string>
 
 namespace cwing 
 {
-	class Button : public Component
+	class Button : public Sprite
 	{
 	public:
 		static Button* getInstance(int x, int y, int w, int h, std::string txt);
