@@ -11,6 +11,7 @@ namespace cwing
 		std::cout << "*** System::System()\n";
 		
 		SDL_Init(SDL_INIT_EVERYTHING);
+		IMG_Init(IMG_INIT_PNG);
 		win = SDL_CreateWindow("Cwing", SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED, 1000, 1000, 0);
 		ren = SDL_CreateRenderer(win, -1, 0);
@@ -27,6 +28,7 @@ namespace cwing
 		TTF_Quit();
 		SDL_DestroyWindow(win);
 		SDL_DestroyRenderer(ren);
+		IMG_Quit();
 		SDL_Quit();
 	}
 

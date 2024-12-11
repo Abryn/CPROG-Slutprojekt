@@ -53,22 +53,6 @@ private:
 	Label* label;
 };
 
-class Character : public Sprite {
-public:
-private:
-//move
-//jump
-//tick
-
-};
-
-class Entity : public Sprite {
-public:
-private:
-//move
-//tick
-
-};
 
 int main(int argc, char** argv) {
 	std::cout << "*** main()\n";
@@ -81,6 +65,8 @@ int main(int argc, char** argv) {
 	engine.add(b);
 	Button* b2 = new MinskaKnapp(lbl);
 	engine.add(b2);
+	Platform* p1 = new Platform(450, 465, 100, 70, constants::gResPath + "images/platform.png")
+	engine.add(p1); 
 	engine.run();
 	
 	return 0;
