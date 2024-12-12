@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Sprite.h"
+#include "Background.h"
 
 namespace cwing 
 {
@@ -12,10 +13,14 @@ namespace cwing
 	public:
 		GameEngine();
 		void add(Sprite* s);
+		void remove(Sprite* s);
 		void run();
+		void setBackground(Background* newBackground);
 		~GameEngine();
 	private:
 		std::vector<Sprite*> sprites;
+		Background* currentBackground;
 	};
 }
+
 #endif

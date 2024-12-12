@@ -8,7 +8,11 @@
 #include "Label.h"
 #include "GameEngine.h"
 #include "Button.h"
+#include "Character.h"
+#include "Platform.h"
 #include <string>
+#include "Constants.h"
+#include "Background.h"
 
 #include <iostream>
 
@@ -33,13 +37,19 @@ int value = 0;
 
 class OkaKnapp : public Button {
 public:
-	OkaKnapp(Label *lbl) :Button(200, 465, 150, 70, "Oka"), label(lbl) {}
+	OkaKnapp(Label *lbl, GameEngine* engine) : Button(200, 465, 150, 70, "Oka"), label(lbl), gameEngine(engine) {}
 	void perform(Button* source) {
 		value++;
 		label->setText(to_string(value));
+
+		if (value == 10) {
+            Background* bg2 = Background::getInstance("images/background2.png");
+            gameEngine->setBackground(bg2);  // Change background to bg2
+        }
 	}
 private:
 	Label* label;
+	GameEngine* gameEngine;
 };
 
 class MinskaKnapp : public Button {
@@ -53,20 +63,27 @@ private:
 	Label* label;
 };
 
-
 int main(int argc, char** argv) {
 	std::cout << "*** main()\n";
 	
 	GameEngine engine;
+
+	Background* bg1 = Background::getInstance("images/background1.png");
+
+	engine.setBackground(bg1);
 	
 	Label* lbl = Label::getInstance(450, 465, 100, 70, "0");
 	engine.add(lbl);
-	Button* b = new OkaKnapp(lbl);
+
+	Button* b = new OkaKnapp(lbl, &engine);
 	engine.add(b);
-	Button* b2 = new MinskaKnapp(lbl);
-	engine.add(b2);
-	Platform* p1 = new Platform(450, 465, 100, 70, constants::gResPath + "images/platform.png")
-	engine.add(p1); 
+	
+	// Platform* p1 = Platform::getInstance(450, 465, 100, 70, "images/platform.png");
+	// engine.add(p1);
+
+	Character* c1 = Character::getInstance(450, 700, 76, 64, "images/character_right.png");
+	engine.add(c1);
+
 	engine.run();
 	
 	return 0;

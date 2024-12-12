@@ -9,6 +9,11 @@ namespace cwing {
         characterImage = IMG_LoadTexture(sys.get_ren(), (constants::gResPath + imagePath).c_str());
     }
 
+    Character::~Character() 
+    {
+        SDL_DestroyTexture(characterImage);
+    }
+
     Character* Character::getInstance(int x, int y, int w, int h, const std::string& imagePath)
     {
         return new Character(x, y, w, h, imagePath);
@@ -16,10 +21,5 @@ namespace cwing {
 
     void Character::draw() const {
         SDL_RenderCopy(sys.get_ren(), characterImage, NULL, &getRect());
-    }
-
-    Character::~Character() 
-    {
-        SDL_DestroyTexture(characterImage);
     }
 }
