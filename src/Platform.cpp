@@ -9,7 +9,7 @@ namespace cwing
     {
         platformImage = IMG_LoadTexture(sys.get_ren(), (constants::gResPath + imagePath).c_str());
     }
-
+    
     Platform* Platform::getInstance(int x, int y, int w, int h, const std::string& imagePath) 
     {
 		return new Platform(x, y, w, h, imagePath);

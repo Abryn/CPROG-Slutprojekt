@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 
+
 namespace cwing 
 {
 	GameEngine::GameEngine() : currentBackground(nullptr) 
@@ -18,23 +19,25 @@ namespace cwing
 
 
 	void GameEngine::setBackground(Background* newBackground) {
-		// Ta bort nuvarande bakgrund om den finns
 		if (currentBackground) {
 			auto it = std::find(sprites.begin(), sprites.end(), static_cast<Sprite*>(currentBackground));
 			if (it != sprites.end()) {
 				sprites.erase(it);
 			}
-			delete currentBackground; // Frigör minnet för den gamla bakgrunden
-		}
+			delete currentBackground; 
+		}	
 
-		// Sätt den nya bakgrunden som aktiv
 		currentBackground = newBackground;
 	}
 
 	void GameEngine::run() 
 	{
+		const int FPS = 60;
+		const int frameDelay = 1000 / FPS;
+
 		bool quit = false;
 		while (!quit) {
+			Uint32 frameStart = SDL_GetTicks();
 			SDL_Event eve;
 			while (SDL_PollEvent(&eve)) {
 				switch (eve.type) {
@@ -56,8 +59,8 @@ namespace cwing
 						s->keyUp(eve);
 					break;
 
-				} // switch
-			} // inre while
+				} 
+			} 
 			
 			SDL_SetRenderDrawColor(sys.get_ren(), 255, 255, 255, 255);
 			SDL_RenderClear(sys.get_ren());
@@ -66,11 +69,19 @@ namespace cwing
 				currentBackground->draw();
 			}
 
+			for (Sprite* s : sprites) {
+				s->update();
+			}
+
 			for (Sprite* s : sprites)
 				s->draw();
 			SDL_RenderPresent(sys.get_ren());
 
-		} //yttre while
+			Uint32 frameTime = SDL_GetTicks() - frameStart;
+        	if (frameDelay > frameTime) {
+            	SDL_Delay(frameDelay - frameTime); 
+        	}
+		}
 
 	}
 

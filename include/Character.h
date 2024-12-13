@@ -11,7 +11,6 @@ namespace cwing {
         public:
             static Character* getInstance(int x, int y, int w, int h, const std::string& imagePath);
             void draw() const;
-            virtual void perform(Character* source) {}
             ~Character();
         protected:
             Character(int x, int y, int w, int h, const std::string& imagePath);

@@ -14,10 +14,12 @@ namespace cwing
 		virtual void keyDown(const SDL_Event&) {}
 		virtual void keyUp(const SDL_Event&) {}
 		virtual void draw() const = 0;
+		virtual void update() {};
 		bool operator==(const Sprite* other) const {
 			return this == other;
 		}
 		const SDL_Rect& getRect() const { return rect; }
+		SDL_Rect& getRect() { return rect; }
 	protected:
 		Sprite(int x, int y, int w, int h);
 	private:
