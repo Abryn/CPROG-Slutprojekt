@@ -6,17 +6,18 @@
 #include <string>
 
 namespace cwing {
-	class Platform : public Sprite
-    {
-	public:
+    class Platform : public Sprite {
+    public:
         static Platform* getInstance(int x, int y, int w, int h, const std::string& imagePath);
-        void draw() const;
+        void draw() const override;
+        bool isPlayerOn(const SDL_Rect& playerRect, float playerVelocityY) const;
+
         ~Platform();
     protected:
         Platform(int x, int y, int w, int h, const std::string& imagePath);
     private:
-		SDL_Texture* platformImage;
-	};
+        SDL_Texture* platformImage;
+    };
 }
 
 #endif

@@ -19,14 +19,6 @@ namespace cwing
 
 
 	void GameEngine::setBackground(Background* newBackground) {
-		if (currentBackground) {
-			auto it = std::find(sprites.begin(), sprites.end(), static_cast<Sprite*>(currentBackground));
-			if (it != sprites.end()) {
-				sprites.erase(it);
-			}
-			delete currentBackground; 
-		}	
-
 		currentBackground = newBackground;
 	}
 
