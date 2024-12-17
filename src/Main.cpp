@@ -65,11 +65,11 @@ private:
 
 class MyPlayer : public Character {
 public:
-    MyPlayer(int x, int y, int w, int h, const std::string& defaultImagePath)
-        : Character(x, y, w, h, defaultImagePath) {}
+    MyPlayer(int x, int y, int w, int h, const std::string& defaultImagePath, std::vector<Platform*> platforms)
+        : Character(x, y, w, h, defaultImagePath), platforms(platforms) {}
 
-    static MyPlayer* getInstance(int x, int y, int w, int h, const std::string& defaultImagePath) {
-        return new MyPlayer(x, y, w, h, defaultImagePath);
+    static MyPlayer* getInstance(int x, int y, int w, int h, const std::string& defaultImagePath, std::vector<Platform*> platforms) {
+        return new MyPlayer(x, y, w, h, defaultImagePath, platforms);
     }
 
     void keyDown(const SDL_Event& event) override {
@@ -89,9 +89,8 @@ public:
                 chargingJump = true;
             }
             break;
-            }
         }
-    
+    }
 
     void keyUp(const SDL_Event& event) override {
         switch (event.key.keysym.sym) {
@@ -101,7 +100,7 @@ public:
         case SDLK_d:
             movingRight = false;
             break;
-       case SDLK_SPACE:
+        case SDLK_SPACE:
             if (chargingJump) {
                 velocityY = -minJumpStrength - (jumpCharge / 2.0f);
                 chargingJump = false;
@@ -112,10 +111,11 @@ public:
         }
     }
 
-    void update() override {
+   void update() override {
     const float moveSpeed = 10.0f;
     const float gravity = 0.5f;
 
+    // Rörelse vänster/höger
     if (!chargingJump) {
         if (movingLeft == movingRight) {
             velocityX = 0.0f;
@@ -130,11 +130,13 @@ public:
 
     getRect().x += static_cast<int>(velocityX);
 
+    // Håll spelaren inom skärmen
     if (getRect().x < 0) getRect().x = 0;
     if (getRect().x + getRect().w > 1000) getRect().x = 1000 - getRect().w;
 
     if (chargingJump && jumpCharge < maxJumpCharge) {
         jumpCharge += 0.5f;
+        
         if (jumpCharge >= maxJumpCharge) {
             
             velocityY = -minJumpStrength - (jumpCharge / 2.0f);
@@ -144,20 +146,32 @@ public:
         }
     }
 
+    // Gravitation
     velocityY += gravity;
     getRect().y += static_cast<int>(velocityY);
 
+    // Kontrollera marknivå
     if (getRect().y >= groundLevel) {
         getRect().y = groundLevel;
         velocityY = 0.0f;
         jumping = false;
     }
 
-    if (getRect().y < 0) {
-        getRect().y = 0;
-        velocityY = 0.0f;
+    for (Platform* p : platforms) {
+        SDL_Rect* playerRect = &getRect();
+        SDL_Rect* platformRect = &p->getRect();
+
+        if (SDL_HasIntersection(playerRect, platformRect)) {
+            // Justera spelarens y-position så att den står ovanpå plattformen
+            playerRect->y = platformRect->y - playerRect->h;
+            velocityY = 0.0f; // Stoppa fallande rörelse
+            jumping = false;  // Spelaren står på en plattform
+            std::cout << "Collision detected!" << std::endl;
+            break; // Ingen anledning att kontrollera fler plattformar
+        }
     }
 }
+
 
 private:
     bool movingLeft = false;
@@ -170,7 +184,10 @@ private:
     const float minJumpStrength = 5.0f;
     const float maxJumpCharge = 30.0f;
     int groundLevel = 830;
+
+    std::vector<Platform*> platforms; // List of platforms for collision checks
 };
+
 
 int main(int argc, char** argv) {
 	std::cout << "*** main()\n";
@@ -187,10 +204,16 @@ int main(int argc, char** argv) {
 	// Button* b = new OkaKnapp(lbl, &engine);
 	// engine.add(b);
 	
-	// Platform* p1 = Platform::getInstance(450, 465, 100, 70, "images/platform.png");
-	// engine.add(p1);
+	std::vector<Platform*> platforms;
+    platforms.push_back(Platform::getInstance(0, 950, 1000, 50, "images/platform.png"));
+    platforms.push_back(Platform::getInstance(100, 600, 200, 50, "images/platform.png"));
+    platforms.push_back(Platform::getInstance(700, 500, 200, 50, "images/platform.png"));
 
-    MyPlayer* player = MyPlayer::getInstance(450, 200, 76, 64, "images/character_idle.png");
+    for (Platform* p : platforms) {
+        engine.add(p);
+    }
+
+    MyPlayer* player = MyPlayer::getInstance(450, 200, 76, 64, "images/character_idle.png", platforms);
     engine.add(player);
 
     if (player->getRect().y + player->getRect().h > 400) {

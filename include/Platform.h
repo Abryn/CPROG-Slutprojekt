@@ -10,8 +10,7 @@ namespace cwing {
     public:
         static Platform* getInstance(int x, int y, int w, int h, const std::string& imagePath);
         void draw() const override;
-        bool isPlayerOn(const SDL_Rect& playerRect, float playerVelocityY) const;
-
+        bool checkCollision(SDL_Rect& playerRect, float& velocityY) const;
         ~Platform();
     protected:
         Platform(int x, int y, int w, int h, const std::string& imagePath);

@@ -17,6 +17,25 @@ namespace cwing {
         SDL_RenderCopy(sys.get_ren(), platformImage, NULL, &getRect());
     }
 
+    bool Platform::checkCollision(SDL_Rect& playerRect) const {
+    SDL_Rect platformRect = getRect();
+
+    // Kontrollera om spelaren landar ovanpå plattformen
+    bool collisionX = (playerRect.x + playerRect.w > platformRect.x) &&
+                      (playerRect.x < platformRect.x + platformRect.w);
+
+    bool collisionY = (playerRect.y + playerRect.h <= platformRect.y) && // Spelaren är ovanför plattformen
+                      (playerRect.y + playerRect.h + 5 >= platformRect.y); // Spelaren "landar"
+
+    if (collisionX && collisionY) {
+        playerRect.y = platformRect.y - playerRect.h; // Justera spelaren ovanpå plattformen
+        return true;
+    }
+    return false;
+}
+
+
+
     Platform::~Platform() {
         SDL_DestroyTexture(platformImage);
     }
