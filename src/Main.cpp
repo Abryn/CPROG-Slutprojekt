@@ -111,79 +111,72 @@ public:
         }
     }
 
-   void update() override {
-    
-    const float gravity = 0.5f;
-    const float jumpChargeRate = 0.5f;
-
-    if (chargingJump) {
-        jumpCharge += jumpChargeRate;
-        if (jumpCharge >= maxJumpCharge) {
-            performJump();
+    void update() override {
+        if (chargingJump) {
+            jumpCharge += jumpChargeRate;
+            if (jumpCharge >= maxJumpCharge) {
+                performJump();
+            }
         }
-    }
 
-    if (movingLeft == movingRight) {
-        jumpDirection = 0;
-    }
-
-    if (!chargingJump && isGrounded) {
         if (movingLeft == movingRight) {
-            velocityX = 0.0f;
             jumpDirection = 0;
-        } else if (movingLeft) {
-            velocityX = -moveSpeed;
-        } else {
-            velocityX = moveSpeed;
         }
-    }
 
-    getRect().x += static_cast<int>(velocityX);
+        if (!chargingJump && isGrounded) {
+            if (movingLeft == movingRight) {
+                velocityX = 0.0f;
+                jumpDirection = 0;
+            } else if (movingLeft) {
+                velocityX = -moveSpeed;
+            } else {
+                velocityX = moveSpeed;
+            }
+        }
 
-    if (getRect().x < 0) getRect().x = 0;
-    if (getRect().x + getRect().w > 1000) getRect().x = 1000 - getRect().w;
+        getRect().x += static_cast<int>(velocityX);
 
-    velocityY += gravity; 
-    getRect().y += static_cast<int>(velocityY);
+        if (getRect().x < 0) getRect().x = 0;
+        if (getRect().x + getRect().w > 1000) getRect().x = 1000 - getRect().w;
 
-    if (getRect().y >= 835) {
-        getRect().y = 835;
-        velocityY = 0.0f;
-        isGrounded = true;
-    }
+        velocityY += gravity; 
+        getRect().y += static_cast<int>(velocityY);
 
-    for (Platform* p : platforms) {
-        SDL_Rect* playerRect = &getRect();
-        SDL_Rect* platformRect = &p->getRect();
+        if (getRect().y >= 835) {
+            getRect().y = 835;
+            velocityY = 0.0f;
+            isGrounded = true;
+        }
 
-        if (SDL_HasIntersection(playerRect, platformRect)) {
-            float deltaLeft = playerRect->x + playerRect->w - platformRect->x;
-            float deltaRight = platformRect->x + platformRect->w - playerRect->x;
-            float deltaTop = playerRect->y + playerRect->h - platformRect->y;
-            float deltaBottom = platformRect->y + platformRect->h - playerRect->y;
+        for (Platform* p : platforms) {
+            SDL_Rect* playerRect = &getRect();
+            SDL_Rect* platformRect = &p->getRect();
 
-            if (deltaLeft > 0 && deltaRight > 0 && deltaTop > 0 && deltaBottom > 0) {
-                if (deltaTop < deltaBottom && deltaTop < deltaLeft && deltaTop < deltaRight) {
-                    isGrounded = true;
-                    playerRect->y = platformRect->y - playerRect->h;
-                    velocityY = 0.0f;
-                } else if (deltaBottom < deltaTop && deltaBottom < deltaLeft && deltaBottom < deltaRight) {
-                    playerRect->y = platformRect->y + platformRect->h;
-                    velocityY = 0.0f;
-                } else if (deltaLeft < deltaRight && deltaLeft < deltaTop && deltaLeft < deltaBottom) {
-                    playerRect->x = platformRect->x - playerRect->w;
-                    velocityX = 0.0f;
-                } else if (deltaRight < deltaLeft && deltaRight < deltaTop && deltaRight < deltaBottom) {
-                    playerRect->x = platformRect->x + platformRect->w;
-                    velocityX = 0.0f;
+            if (SDL_HasIntersection(playerRect, platformRect)) {
+                float deltaLeft = playerRect->x + playerRect->w - platformRect->x;
+                float deltaRight = platformRect->x + platformRect->w - playerRect->x;
+                float deltaTop = playerRect->y + playerRect->h - platformRect->y;
+                float deltaBottom = platformRect->y + platformRect->h - playerRect->y;
+
+                if (deltaLeft > 0 && deltaRight > 0 && deltaTop > 0 && deltaBottom > 0) {
+                    if (deltaTop < deltaBottom && deltaTop < deltaLeft && deltaTop < deltaRight) {
+                        isGrounded = true;
+                        playerRect->y = platformRect->y - playerRect->h;
+                        velocityY = 0.0f;
+                    } else if (deltaBottom < deltaTop && deltaBottom < deltaLeft && deltaBottom < deltaRight) {
+                        playerRect->y = platformRect->y + platformRect->h;
+                        velocityY = 0.0f;
+                    } else if (deltaLeft < deltaRight && deltaLeft < deltaTop && deltaLeft < deltaBottom) {
+                        playerRect->x = platformRect->x - playerRect->w;
+                        velocityX = 0.0f;
+                    } else if (deltaRight < deltaLeft && deltaRight < deltaTop && deltaRight < deltaBottom) {
+                        playerRect->x = platformRect->x + platformRect->w;
+                        velocityX = 0.0f;
+                    }
                 }
             }
-
         }
     }
-}
-
-        
     
 private:
     void performJump() {
@@ -193,6 +186,7 @@ private:
         velocityX = moveSpeed * jumpDirection;
         movingLeft = false;
         movingRight = false;
+        jumpCharge = 0.0f;
     }
 
     bool movingLeft = false;
@@ -205,7 +199,8 @@ private:
     float jumpCharge = 0.0f;
     const float minJumpCharge = 2.5f;
     const float maxJumpCharge = 20.0f;
-
+    const float gravity = 0.5f;
+    const float jumpChargeRate = 0.5f;
     int jumpDirection = 0;
 
 
@@ -228,7 +223,6 @@ int main(int argc, char** argv) {
 	// engine.add(b);
 	
 	std::vector<Platform*> platforms;
-    platforms.push_back(Platform::getInstance(0, 830, 1000, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(100, 600, 200, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(500, 600, 200, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(700, 500, 200, 50, "images/platform.png"));
