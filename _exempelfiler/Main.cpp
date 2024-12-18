@@ -127,7 +127,6 @@ public:
         jumpDirection = 0;
     }
 
-    // Rörelse vänster/höger
     if (!chargingJump && isGrounded) {
         if (movingLeft == movingRight) {
             velocityX = 0.0f;
@@ -141,14 +140,12 @@ public:
 
     getRect().x += static_cast<int>(velocityX);
 
-    // Håll spelaren inom skärmen
     if (getRect().x < 0) getRect().x = 0;
     if (getRect().x + getRect().w > 1000) getRect().x = 1000 - getRect().w;
 
     velocityY += gravity; 
     getRect().y += static_cast<int>(velocityY);
 
-    // Kontrollera marknivå
     if (getRect().y >= 835) {
         getRect().y = 835;
         velocityY = 0.0f;
@@ -160,18 +157,34 @@ public:
         SDL_Rect* platformRect = &p->getRect();
 
         if (SDL_HasIntersection(playerRect, platformRect)) {
-            // Justera spelarens y-position så att den står ovanpå plattformen
-            playerRect->y = platformRect->y - playerRect->h;
-            velocityY = 0.0f; // Stoppa fallande rörelse
-            isGrounded = true;  // Spelaren står på en plattform
-            std::cout << "Collision detected!" << std::endl;
-            break; // Ingen anledning att kontrollera fler plattformar
+            float deltaLeft = playerRect->x + playerRect->w - platformRect->x;
+            float deltaRight = platformRect->x + platformRect->w - playerRect->x;
+            float deltaTop = playerRect->y + playerRect->h - platformRect->y;
+            float deltaBottom = platformRect->y + platformRect->h - playerRect->y;
+
+            if (deltaLeft > 0 && deltaRight > 0 && deltaTop > 0 && deltaBottom > 0) {
+                if (deltaTop < deltaBottom && deltaTop < deltaLeft && deltaTop < deltaRight) {
+                    isGrounded = true;
+                    playerRect->y = platformRect->y - playerRect->h;
+                    velocityY = 0.0f;
+                } else if (deltaBottom < deltaTop && deltaBottom < deltaLeft && deltaBottom < deltaRight) {
+                    playerRect->y = platformRect->y + platformRect->h;
+                    velocityY = 0.0f;
+                } else if (deltaLeft < deltaRight && deltaLeft < deltaTop && deltaLeft < deltaBottom) {
+                    playerRect->x = platformRect->x - playerRect->w;
+                    velocityX = 0.0f;
+                } else if (deltaRight < deltaLeft && deltaRight < deltaTop && deltaRight < deltaBottom) {
+                    playerRect->x = platformRect->x + platformRect->w;
+                    velocityX = 0.0f;
+                }
+            }
+
         }
     }
 }
 
-
-
+        
+    
 private:
     void performJump() {
         chargingJump = false;
@@ -217,6 +230,7 @@ int main(int argc, char** argv) {
 	std::vector<Platform*> platforms;
     platforms.push_back(Platform::getInstance(0, 830, 1000, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(100, 600, 200, 50, "images/platform.png"));
+    platforms.push_back(Platform::getInstance(500, 600, 200, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(700, 500, 200, 50, "images/platform.png"));
 
     for (Platform* p : platforms) {
