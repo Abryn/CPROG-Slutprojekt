@@ -13,6 +13,7 @@
 #include <string>
 #include "Constants.h"
 #include "Background.h"
+#include <map>
 
 #include <iostream>
 
@@ -73,59 +74,69 @@ public:
     }
 
     void keyDown(const SDL_Event& event) override {
-        switch (event.key.keysym.sym) {
-        case SDLK_a:
-            if (!chargingJump) {
+        if (isGrounded) {
+            switch (event.key.keysym.sym) {
+            case SDLK_a:
                 movingLeft = true;
-            }
-            break;
-        case SDLK_d:
-            if (!chargingJump) {
+                jumpDirection = -1;
+                break;
+            case SDLK_d:
                 movingRight = true;
+                jumpDirection = 1;
+                break;
+            case SDLK_SPACE:
+                if (!chargingJump) {
+                    chargingJump = true;
+                    velocityX = 0.0f;
+                    jumpCharge = 0.0f;
+                    break;
+                }
             }
-            break;
-        case SDLK_SPACE:
-            if (!jumping) {
-                chargingJump = true;
-            }
-            break;
         }
     }
 
     void keyUp(const SDL_Event& event) override {
-        switch (event.key.keysym.sym) {
-        case SDLK_a:
-            movingLeft = false;
-            break;
-        case SDLK_d:
-            movingRight = false;
-            break;
-        case SDLK_SPACE:
-            if (chargingJump) {
-                velocityY = -minJumpStrength - (jumpCharge / 2.0f);
-                chargingJump = false;
-                jumpCharge = 0;
-                jumping = true;
+        if (isGrounded) {
+            switch (event.key.keysym.sym) {
+            case SDLK_a:
+                movingLeft = false;
+                break;
+            case SDLK_d:
+                movingRight = false;
+                break;
+            case SDLK_SPACE:
+                performJump();
+                break;
             }
-            break;
         }
     }
 
    void update() override {
-    const float moveSpeed = 10.0f;
+    
     const float gravity = 0.5f;
+    const float jumpChargeRate = 0.5f;
+
+    if (chargingJump) {
+        jumpCharge += jumpChargeRate;
+        if (jumpCharge >= maxJumpCharge) {
+            performJump();
+        }
+    }
+
+    if (movingLeft == movingRight) {
+        jumpDirection = 0;
+    }
 
     // Rörelse vänster/höger
-    if (!chargingJump) {
+    if (!chargingJump && isGrounded) {
         if (movingLeft == movingRight) {
             velocityX = 0.0f;
+            jumpDirection = 0;
         } else if (movingLeft) {
             velocityX = -moveSpeed;
         } else {
             velocityX = moveSpeed;
         }
-    } else {
-        velocityX = 0.0f;
     }
 
     getRect().x += static_cast<int>(velocityX);
@@ -134,27 +145,14 @@ public:
     if (getRect().x < 0) getRect().x = 0;
     if (getRect().x + getRect().w > 1000) getRect().x = 1000 - getRect().w;
 
-    if (chargingJump && jumpCharge < maxJumpCharge) {
-        jumpCharge += 0.5f;
-        
-        if (jumpCharge >= maxJumpCharge) {
-            
-            velocityY = -minJumpStrength - (jumpCharge / 2.0f);
-            chargingJump = false; 
-            jumpCharge = 0;       
-            jumping = true;       
-        }
-    }
-
-    // Gravitation
-    velocityY += gravity;
+    velocityY += gravity; 
     getRect().y += static_cast<int>(velocityY);
 
     // Kontrollera marknivå
-    if (getRect().y >= groundLevel) {
-        getRect().y = groundLevel;
+    if (getRect().y >= 835) {
+        getRect().y = 835;
         velocityY = 0.0f;
-        jumping = false;
+        isGrounded = true;
     }
 
     for (Platform* p : platforms) {
@@ -165,7 +163,7 @@ public:
             // Justera spelarens y-position så att den står ovanpå plattformen
             playerRect->y = platformRect->y - playerRect->h;
             velocityY = 0.0f; // Stoppa fallande rörelse
-            jumping = false;  // Spelaren står på en plattform
+            isGrounded = true;  // Spelaren står på en plattform
             std::cout << "Collision detected!" << std::endl;
             break; // Ingen anledning att kontrollera fler plattformar
         }
@@ -173,21 +171,33 @@ public:
 }
 
 
+
 private:
+    void performJump() {
+        chargingJump = false;
+        isGrounded = false;
+        velocityY = -std::max(jumpCharge, minJumpCharge);
+        velocityX = moveSpeed * jumpDirection;
+        movingLeft = false;
+        movingRight = false;
+    }
+
     bool movingLeft = false;
     bool movingRight = false;
-    bool jumping = false;
     bool chargingJump = false;
+    bool isGrounded = true;
     float velocityX = 0.0f;
     float velocityY = 0.0f;
+    const float moveSpeed = 5.0f;
     float jumpCharge = 0.0f;
-    const float minJumpStrength = 5.0f;
-    const float maxJumpCharge = 30.0f;
-    int groundLevel = 830;
+    const float minJumpCharge = 2.5f;
+    const float maxJumpCharge = 20.0f;
+
+    int jumpDirection = 0;
+
 
     std::vector<Platform*> platforms; // List of platforms for collision checks
 };
-
 
 int main(int argc, char** argv) {
 	std::cout << "*** main()\n";
@@ -205,7 +215,7 @@ int main(int argc, char** argv) {
 	// engine.add(b);
 	
 	std::vector<Platform*> platforms;
-    platforms.push_back(Platform::getInstance(0, 950, 1000, 50, "images/platform.png"));
+    platforms.push_back(Platform::getInstance(0, 830, 1000, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(100, 600, 200, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(700, 500, 200, 50, "images/platform.png"));
 
