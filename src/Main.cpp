@@ -136,8 +136,11 @@ public:
 
         getRect().x += static_cast<int>(velocityX);
 
-        if (getRect().x < 0) getRect().x = 0;
-        if (getRect().x + getRect().w > 1000) getRect().x = 1000 - getRect().w;
+        if (getRect().x + getRect().w < 0) {
+            getRect().x = 1000;
+        } else if (getRect().x > 1000) {
+            getRect().x = -getRect().w;
+        }
 
         velocityY += gravity; 
         getRect().y += static_cast<int>(velocityY);
@@ -223,23 +226,19 @@ int main(int argc, char** argv) {
 	// engine.add(b);
 	
 	std::vector<Platform*> platforms;
-    platforms.push_back(Platform::getInstance(100, 600, 200, 50, "images/platform.png"));
-    platforms.push_back(Platform::getInstance(500, 600, 200, 50, "images/platform.png"));
-    platforms.push_back(Platform::getInstance(700, 500, 200, 50, "images/platform.png"));
+    platforms.push_back(Platform::getInstance(50, 760, 200, 50, "images/platform.png"));
+    platforms.push_back(Platform::getInstance(750, 500, 200, 50, "images/platform.png"));
+    platforms.push_back(Platform::getInstance(500, 300, 200, 50, "images/platform.png"));
+    platforms.push_back(Platform::getInstance(350, 200, 100, 50, "images/platform.png"));
+    platforms.push_back(Platform::getInstance(200, 150, 100, 50, "images/platform.png"));
+    platforms.push_back(Platform::getInstance(50, 100, 100, 50, "images/platform.png"));
 
     for (Platform* p : platforms) {
         engine.add(p);
     }
 
-    MyPlayer* player = MyPlayer::getInstance(450, 200, 76, 64, "images/character_idle.png", platforms);
+    MyPlayer* player = MyPlayer::getInstance(450, 700, 76, 64, "images/character_idle.png", platforms);
     engine.add(player);
-
-    if (player->getRect().y + player->getRect().h > 400) {
-        Background* bg2 = Background::getInstance("images/background2.png");
-        engine.setBackground(bg2);
-    } else {
-        engine.setBackground(bg1);
-    }
 
 	engine.run();
 	
