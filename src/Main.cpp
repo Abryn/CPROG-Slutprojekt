@@ -210,6 +210,40 @@ private:
     std::vector<Platform*> platforms; 
 };
 
+class Bird : public Character {
+    public:
+        Bird(int x, int y, int w, int h, const std::string& defaultImagePath, float velocityX, const bool looping)
+            : Character(x, y, w, h, defaultImagePath), velocityX(velocityX), looping(looping) {}
+        
+        static Bird* getInstance(int x, int y, int w, int h, const std::string& defaultImagePath, const float velocityX, const bool looping) {
+            return new Bird(x, y, w, h, defaultImagePath, velocityX, looping);
+        }
+
+        void update() override {
+
+        getRect().x += static_cast<int>(velocityX);
+
+        if (looping) {
+            if (getRect().x + getRect().w < 0) {
+                getRect().x = 1000;
+            } else if (getRect().x > 1000) {
+                getRect().x = -getRect().w;
+            }
+        } else {
+            if (getRect().x < 0 || getRect().x + getRect().w > 1000) {
+                velocityX = -velocityX;
+            }
+        }
+        
+        time += 0.1f;
+        getRect().y = getRect().y  + static_cast<int>(5.0f * sin(time));
+    }
+    private:
+        float velocityX;
+        const bool looping;
+        float time;
+};
+
 int main(int argc, char** argv) {
 	std::cout << "*** main()\n";
 	
@@ -226,19 +260,28 @@ int main(int argc, char** argv) {
 	// engine.add(b);
 	
 	std::vector<Platform*> platforms;
+    std::vector<Bird*> birds;
+    
     platforms.push_back(Platform::getInstance(50, 760, 200, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(750, 500, 200, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(500, 300, 200, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(350, 200, 100, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(200, 150, 100, 50, "images/platform.png"));
     platforms.push_back(Platform::getInstance(50, 100, 100, 50, "images/platform.png"));
-
+    
     for (Platform* p : platforms) {
         engine.add(p);
     }
 
-    MyPlayer* player = MyPlayer::getInstance(450, 700, 76, 64, "images/character_idle.png", platforms);
+    MyPlayer* player = MyPlayer::getInstance(450, 500, 76, 64, "images/character_idle.png", platforms);
     engine.add(player);
+
+    Bird* bird1 = Bird::getInstance(200, 650, 38, 32, "images/character_idle.png", 10.0f, true);
+    Bird* bird2 = Bird::getInstance(700, 100, 38, 32, "images/character_idle.png", 2.5f, false);
+    Bird* bird3 = Bird::getInstance(500, 300, 38, 32, "images/character_idle.png", 5.0f, false);
+    engine.add(bird1);
+    engine.add(bird2);
+    engine.add(bird3);
 
 	engine.run();
 	
