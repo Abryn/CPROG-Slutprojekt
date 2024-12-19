@@ -17,6 +17,16 @@ namespace cwing
 		sprites.push_back(s);
 	}
 
+	void GameEngine::remove(Sprite* s) 
+	{
+		auto it = std::find(sprites.begin(), sprites.end(), s);
+    
+		if (it != sprites.end()) {
+			delete *it;
+			sprites.erase(it);
+		}
+	} 
+
 
 	void GameEngine::setBackground(Background* newBackground) {
 		currentBackground = newBackground;
