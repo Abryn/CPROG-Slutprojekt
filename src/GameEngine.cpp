@@ -27,6 +27,8 @@ namespace cwing
 		}
 	} 
 
+	
+
 
 	void GameEngine::setBackground(Background* newBackground) {
 		currentBackground = newBackground;

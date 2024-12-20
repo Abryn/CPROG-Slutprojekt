@@ -34,36 +34,6 @@
 using namespace std;
 using namespace cwing;
 
-int value = 0;
-
-class OkaKnapp : public Button {
-public:
-	OkaKnapp(Label *lbl, GameEngine* engine) : Button(200, 465, 150, 70, "Oka"), label(lbl), gameEngine(engine) {}
-	void perform(Button* source) {
-		value++;
-		label->setText(to_string(value));
-
-		if (value == 10) {
-            Background* bg2 = Background::getInstance("images/background2.png");
-            gameEngine->setBackground(bg2);
-        }
-	}
-private:
-	Label* label;
-	GameEngine* gameEngine;
-};
-
-class MinskaKnapp : public Button {
-public:
-	MinskaKnapp(Label *lbl) :Button(650, 465, 150, 70, "Minska"), label(lbl) {}
-	void perform(Button* source) {
-		value--;
-		label->setText(to_string(value));
-	}
-private:
-	Label* label;
-};
-
 class Bird : public Character {
     public:
         Bird(int x, int y, int w, int h, const std::string& defaultImagePath, float velocityX, const bool looping)
@@ -278,9 +248,6 @@ int main(int argc, char** argv) {
 	Background* bg1 = Background::getInstance("images/background1.png");
 
 	engine.setBackground(bg1);
-	
-	// Button* b = new OkaKnapp(lbl, &engine);
-	// engine.add(b);
 	
 	std::vector<Platform*> platforms;
     std::vector<Bird*> birds;
