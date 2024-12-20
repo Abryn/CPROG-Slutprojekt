@@ -7,7 +7,6 @@
 #include <SDL2/SDL.h>
 #include "Label.h"
 #include "GameEngine.h"
-#include "Button.h"
 #include "Character.h"
 #include "Platform.h"
 #include <string>
@@ -161,7 +160,7 @@ public:
         for (Platform* p : platforms) {
             SDL_Rect* platformRect = &p->getRect();
 
-            if (SDL_HasIntersection(playerRect, platformRect)) {
+            if (engine->checkCollisionBetweenSprites(this, p)) {
                 float deltaLeft = playerRect->x + playerRect->w - platformRect->x;
                 float deltaRight = platformRect->x + platformRect->w - playerRect->x;
                 float deltaTop = playerRect->y + playerRect->h - platformRect->y;
@@ -183,15 +182,15 @@ public:
                         velocityX = 0.0f;
                     }
                 }
-            }
+            }     
         }
+
 
         for (auto it = birds.begin(); it != birds.end();) {
             Bird* b = *it;
-            SDL_Rect* birdRect = &b->getRect();
             birdsLeft = birds.size();
 
-            if (SDL_HasIntersection(playerRect, birdRect)) {
+            if (engine->checkCollisionBetweenSprites(this, b)) {
                 engine->remove(b);  
                 it = birds.erase(it);
                 birdsLeft--;

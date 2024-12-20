@@ -16,6 +16,7 @@ namespace cwing
 		void remove(Sprite* s);
 		void run();
 		void setBackground(Background* newBackground);
+		bool checkCollisionBetweenSprites(const Sprite* a, const Sprite* b);
 		~GameEngine();
 	private:
 		std::vector<Sprite*> sprites;

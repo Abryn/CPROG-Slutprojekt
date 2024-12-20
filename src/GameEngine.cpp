@@ -27,8 +27,9 @@ namespace cwing
 		}
 	} 
 
-	
-
+	bool GameEngine::checkCollisionBetweenSprites(const Sprite* a, const Sprite* b) {
+    	return SDL_HasIntersection(&a->getRect(), &b->getRect());
+	}
 
 	void GameEngine::setBackground(Background* newBackground) {
 		currentBackground = newBackground;

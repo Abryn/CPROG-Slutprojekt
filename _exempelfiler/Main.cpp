@@ -7,7 +7,6 @@
 #include <SDL2/SDL.h>
 #include "Label.h"
 #include "GameEngine.h"
-#include "Button.h"
 #include "Character.h"
 #include "Platform.h"
 #include <string>
@@ -34,43 +33,50 @@
 using namespace std;
 using namespace cwing;
 
-int value = 0;
-
-class OkaKnapp : public Button {
-public:
-	OkaKnapp(Label *lbl, GameEngine* engine) : Button(200, 465, 150, 70, "Oka"), label(lbl), gameEngine(engine) {}
-	void perform(Button* source) {
-		value++;
-		label->setText(to_string(value));
-
-		if (value == 10) {
-            Background* bg2 = Background::getInstance("images/background2.png");
-            gameEngine->setBackground(bg2);
+class Bird : public Character {
+    public:
+        Bird(int x, int y, int w, int h, const std::string& defaultImagePath, float velocityX, const bool looping)
+            : Character(x, y, w, h, defaultImagePath), velocityX(velocityX), looping(looping) {}
+        
+        static Bird* getInstance(int x, int y, int w, int h, const std::string& defaultImagePath, const float velocityX, const bool looping) {
+            return new Bird(x, y, w, h, defaultImagePath, velocityX, looping);
         }
-	}
-private:
-	Label* label;
-	GameEngine* gameEngine;
-};
 
-class MinskaKnapp : public Button {
-public:
-	MinskaKnapp(Label *lbl) :Button(650, 465, 150, 70, "Minska"), label(lbl) {}
-	void perform(Button* source) {
-		value--;
-		label->setText(to_string(value));
-	}
-private:
-	Label* label;
+        void update() override {
+            getRect().x += static_cast<int>(velocityX);
+
+            if (looping) {
+                if (getRect().x + getRect().w < 0) {
+                    getRect().x = 1000;
+                } else if (getRect().x > 1000) {
+                    getRect().x = -getRect().w;
+                }
+            } else {
+                if (getRect().x < 0 || getRect().x + getRect().w > 1000) {
+                    velocityX = -velocityX;
+                }
+            }
+            
+            time += 0.1f;
+            getRect().y = getRect().y  + static_cast<int>(5.0f * sin(time));
+        }
+
+        
+    private:
+        float velocityX;
+        const bool looping;
+        float time;
 };
 
 class MyPlayer : public Character {
 public:
-    MyPlayer(int x, int y, int w, int h, const std::string& defaultImagePath, std::vector<Platform*> platforms)
-        : Character(x, y, w, h, defaultImagePath), platforms(platforms) {}
+    MyPlayer(int x, int y, int w, int h, const std::string& defaultImagePath, std::vector<Platform*> platforms,
+            std::vector<Bird*> birds, GameEngine* engine, Label* birdsLeftLabel)
+        : Character(x, y, w, h, defaultImagePath), platforms(platforms), birds(birds), engine(engine), birdsLeftLabel(birdsLeftLabel) {}
 
-    static MyPlayer* getInstance(int x, int y, int w, int h, const std::string& defaultImagePath, std::vector<Platform*> platforms) {
-        return new MyPlayer(x, y, w, h, defaultImagePath, platforms);
+    static MyPlayer* getInstance(int x, int y, int w, int h, const std::string& defaultImagePath, std::vector<Platform*> platforms,
+            std::vector<Bird*> birds, GameEngine* engine, Label* birdsLeftLabel) {
+        return new MyPlayer(x, y, w, h, defaultImagePath, platforms, birds, engine, birdsLeftLabel);
     }
 
     void keyDown(const SDL_Event& event) override {
@@ -152,10 +158,9 @@ public:
         }
 
         for (Platform* p : platforms) {
-            SDL_Rect* playerRect = &getRect();
             SDL_Rect* platformRect = &p->getRect();
 
-            if (SDL_HasIntersection(playerRect, platformRect)) {
+            if (engine->checkCollisionBetweenSprites(this, p)) {
                 float deltaLeft = playerRect->x + playerRect->w - platformRect->x;
                 float deltaRight = platformRect->x + platformRect->w - playerRect->x;
                 float deltaTop = playerRect->y + playerRect->h - platformRect->y;
@@ -177,6 +182,25 @@ public:
                         velocityX = 0.0f;
                     }
                 }
+            }     
+        }
+
+
+        for (auto it = birds.begin(); it != birds.end();) {
+            Bird* b = *it;
+            birdsLeft = birds.size();
+
+            if (engine->checkCollisionBetweenSprites(this, b)) {
+                engine->remove(b);  
+                it = birds.erase(it);
+                birdsLeft--;
+                birdsLeftLabel->setText(std::to_string(birdsLeft));
+                if (birdsLeft == 0) {
+                    Label* gameOver = Label::getInstance(100, 300, 800, 400, "Cat wins!");
+                    engine->add(gameOver);
+                }
+            } else {
+                ++it; 
             }
         }
     }
@@ -205,43 +229,14 @@ private:
     const float gravity = 0.5f;
     const float jumpChargeRate = 0.5f;
     int jumpDirection = 0;
+    int birdsLeft;
+    SDL_Rect* playerRect = &getRect();
 
 
-    std::vector<Platform*> platforms; 
-};
-
-class Bird : public Character {
-    public:
-        Bird(int x, int y, int w, int h, const std::string& defaultImagePath, float velocityX, const bool looping)
-            : Character(x, y, w, h, defaultImagePath), velocityX(velocityX), looping(looping) {}
-        
-        static Bird* getInstance(int x, int y, int w, int h, const std::string& defaultImagePath, const float velocityX, const bool looping) {
-            return new Bird(x, y, w, h, defaultImagePath, velocityX, looping);
-        }
-
-        void update() override {
-
-        getRect().x += static_cast<int>(velocityX);
-
-        if (looping) {
-            if (getRect().x + getRect().w < 0) {
-                getRect().x = 1000;
-            } else if (getRect().x > 1000) {
-                getRect().x = -getRect().w;
-            }
-        } else {
-            if (getRect().x < 0 || getRect().x + getRect().w > 1000) {
-                velocityX = -velocityX;
-            }
-        }
-        
-        time += 0.1f;
-        getRect().y = getRect().y  + static_cast<int>(5.0f * sin(time));
-    }
-    private:
-        float velocityX;
-        const bool looping;
-        float time;
+    std::vector<Platform*> platforms;
+    std::vector<Bird*> birds;
+    GameEngine* engine;
+    Label* birdsLeftLabel;
 };
 
 int main(int argc, char** argv) {
@@ -252,12 +247,6 @@ int main(int argc, char** argv) {
 	Background* bg1 = Background::getInstance("images/background1.png");
 
 	engine.setBackground(bg1);
-	
-	// Label* lbl = Label::getInstance(450, 465, 100, 70, "0");
-	// engine.add(lbl);
-
-	// Button* b = new OkaKnapp(lbl, &engine);
-	// engine.add(b);
 	
 	std::vector<Platform*> platforms;
     std::vector<Bird*> birds;
@@ -273,15 +262,21 @@ int main(int argc, char** argv) {
         engine.add(p);
     }
 
-    MyPlayer* player = MyPlayer::getInstance(450, 500, 76, 64, "images/character_idle.png", platforms);
-    engine.add(player);
+    birds.push_back(Bird::getInstance(800, 650, 80, 60, "images/bird.png", 10.0f, true));
+    birds.push_back(Bird::getInstance(700, 100, 80, 60, "images/bird.png", 2.5f, false));
+    birds.push_back(Bird::getInstance(500, 300, 80, 60, "images/bird.png", 5.0f, false));
 
-    Bird* bird1 = Bird::getInstance(200, 650, 38, 32, "images/character_idle.png", 10.0f, true);
-    Bird* bird2 = Bird::getInstance(700, 100, 38, 32, "images/character_idle.png", 2.5f, false);
-    Bird* bird3 = Bird::getInstance(500, 300, 38, 32, "images/character_idle.png", 5.0f, false);
-    engine.add(bird1);
-    engine.add(bird2);
-    engine.add(bird3);
+    
+    for (Bird* b : birds) {
+        engine.add(b);
+    }
+
+    Label* birdsLeftLabel = Label::getInstance(880, 0, 100, 100, std::to_string(birds.size()));
+	engine.add(birdsLeftLabel);
+
+
+    MyPlayer* player = MyPlayer::getInstance(450, 500, 76, 64, "images/character_idle.png", platforms, birds, &engine, birdsLeftLabel);
+    engine.add(player);
 
 	engine.run();
 	
