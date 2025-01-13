@@ -158,7 +158,6 @@ public:
         }
 
         for (Platform* p : platforms) {
-            SDL_Rect* playerRect = getRect();
             SDL_Rect* platformRect = &p->getRect();
 
             if (engine->checkCollisionBetweenSprites(this, p)) {
@@ -231,6 +230,8 @@ private:
     const float jumpChargeRate = 0.5f;
     int jumpDirection = 0;
     int birdsLeft;
+    SDL_Rect* playerRect = &getRect();
+
 
     std::vector<Platform*> platforms;
     std::vector<Bird*> birds;
